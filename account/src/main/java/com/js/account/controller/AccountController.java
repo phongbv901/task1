@@ -1,16 +1,14 @@
 package com.js.account.controller;
 
 import com.js.account.domain.Account;
-import com.js.account.domain.AccountBuilder;
+import com.js.account.dto.AccountDto;
 import com.js.account.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.List;
 
 @Path("/v1/accounts")
 public class AccountController {
@@ -21,11 +19,35 @@ public class AccountController {
 
     @Path("/account/{accountId}")
     @GET
-    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Account getAccountById(@PathParam("accountId") Integer accountId){
-        AccountBuilder builder = new AccountBuilder(1,"","us");
-        builder.withAmount(10.5);
-        return builder.build();
+    public Account getAccountById(@PathParam("accountId") Integer accountId) {
+        return accountService.getAccountById(accountId);
+    }
+
+    @Path("/account")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public List<Account> getAll(){
+        return accountService.getAll();
+    }
+
+
+    @Path("/account")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Integer createAccount(AccountDto accountDto){
+        return accountService.createAccount(accountDto);
+    }
+
+    @Path("/account/{accountId}")
+    @PUT
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response updateAccount(@PathParam("accountId") Integer accountId, AccountDto accountDto){
+        // In real project, there will be have a return bad request message. I just do happy case in here
+        if(accountDto != null){
+            accountDto.setId(accountId);
+            accountService.updateAccount(accountDto);
+        }
+        return Response.ok().build();
     }
 }
