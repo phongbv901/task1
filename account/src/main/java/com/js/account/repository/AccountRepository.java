@@ -1,26 +1,43 @@
 package com.js.account.repository;
 
 import com.js.account.domain.Account;
+import com.js.account.util.JsonUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountRepository {
 
-    public Account getAccountById(Integer id){
+    public Account getAccountById(Integer id) {
+        List<Account> data = JsonUtil.readData();
+        return data.stream().filter(account -> account.getId() != null && account.getId().equals(id)).findFirst().get();
+    }
+
+    public List<Account> getAll() {
+        return JsonUtil.readData();
+    }
+
+    public Integer createAccount(Account account) {
+        List<Account> data = JsonUtil.readData();
+        int biggestId = 0;
+        for(Account tmp : data){
+            if(tmp.getId() > biggestId){
+                biggestId = tmp.getId();
+            }
+        }
+        account.setId(biggestId++);
+        data.add(account);
+        JsonUtil.saveData(data);
         return null;
     }
 
-    public List<Account> getAll(){
-        return null;
-    }
-
-    public Integer createAccount(Account account){
-        return null;
-    }
-
-    public void updateAccount(Account account){
-
+    public void updateAccount(Account account) {
+        List<Account> data = JsonUtil.readData();
+        data = data.stream().map(tmp ->
+                tmp.getId().equals(account.getId()) ? account : tmp
+        ).collect(Collectors.toList());
+        JsonUtil.saveData(data);
     }
 }
