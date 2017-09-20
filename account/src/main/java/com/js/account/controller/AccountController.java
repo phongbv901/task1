@@ -2,6 +2,7 @@ package com.js.account.controller;
 
 import com.js.account.domain.Account;
 import com.js.account.dto.AccountDto;
+import com.js.account.dto.Errordto;
 import com.js.account.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -20,8 +21,13 @@ public class AccountController {
     @Path("/account/{accountId}")
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Account getAccountById(@PathParam("accountId") Integer accountId) {
-        return accountService.getAccountById(accountId);
+    public Response getAccountById(@PathParam("accountId") Integer accountId) {
+        Account account = accountService.getAccountById(accountId);
+        if(account != null){
+            return Response.ok().entity(account).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).entity(new Errordto("Account not found!")).build();
+        }
     }
 
     @Path("/account")
